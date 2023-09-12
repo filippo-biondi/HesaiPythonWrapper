@@ -30,7 +30,7 @@ include_directories(
         HesaiLidar_SDK_2.0/driver
 )
 
-find_package(PCL COMPONENTS common io QUIET REQUIRED)
+find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)

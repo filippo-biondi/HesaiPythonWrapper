@@ -78,10 +78,30 @@ std::string HesaiWrapper::get_point_cloud()
 	}
 	while (this->lock.test_and_set()) {}
 
-	std::string file_name = "/tmp/HesaiWrapper/PointCloud" + std::to_string(this->count++) + ".pcd";
-	writer->writeASCII(file_name, *this->point_cloud);
+	pcl::PointCloud<pcl::PointXYZ>::Ptr base_pcl(new pcl::PointCloud<pcl::PointXYZ>);
+
+	for(size_t i=0; i < this->point_cloud->size(); i++)
+	{
+		if(this->point_cloud->points[i].x == 0 && this->point_cloud->points[i].y == 0 && this->point_cloud->points[i].z == 0)
+		{
+			continue;
+		}
+		if(pow(this->point_cloud->points[i].x,2) + pow(this->point_cloud->points[i].y,2) + pow(this->point_cloud->points[i].z,2) < 9)
+		{
+			pcl::PointXYZ p;
+
+			p.x = this->point_cloud->points[i].x;
+			p.y = this->point_cloud->points[i].y;
+			p.z = this->point_cloud->points[i].z;
+			base_pcl->push_back(p);
+		}
+
+	}
 
 	lock.clear();
+
+	std::string file_name = "/tmp/HesaiWrapper/PointCloud" + std::to_string(this->count++) + ".pcd";
+	writer->writeBinary(file_name, *base_pcl);
 
 	return file_name;
 }
